@@ -20,7 +20,7 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 - [ ] 一键安装 LNMP 或其中的一项或几项，可手动选安装套件
 - [ ] Hack Things (自动安装自用的一些渗透工具集)
 - [ ] macOS Things (自用的一些 macOS 终端配置)
-
+- [ ] 反向操作 (如恢复 Linux 发行版的包管理源和卸载 oh-my-zsh 等)
 
 ## 包管理替换支持的发行版
 - [X] Ubuntu 12.04 ~ 20.04 (x86_64 / aarch64)
