@@ -16,6 +16,11 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 - [X] Linux 发行版的包管理一键替换清华源
 - [X] macOS Homebrew 一键从国内清华源安装和替换仓库地址
 - [X] 一键安装 zsh + oh-my-zsh 并添加插件 z sudo 和下载 zsh-autosuggestions 自动补全
+- [ ] 一键安装 pyenv 并配置 PATH 等操作
+- [ ] 一键安装 LNMP 或其中的一项或几项，可手动选安装套件
+- [ ] Hack Things (自动安装自用的一些渗透工具集)
+- [ ] macOS Things (自用的一些 macOS 终端配置)
+
 
 ## 包管理替换支持的发行版
 - [X] Ubuntu 12.04 ~ 20.04 (x86_64 / aarch64)
