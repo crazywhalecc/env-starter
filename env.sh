@@ -5,10 +5,14 @@ ubuntu_apt_ver="xenial"
 is_ports=""
 tools_url="http://124.70.24.97/tools"
 
+unix_s=$(uname -s)
+unix_release=$(if [ "$unix_s" = "Linux" ]; then cat /etc/issue | grep -v '^$' | awk '{print $1}'; elif [ "$unix_s" = "Darwin" ]; then sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'; fi)
+
 trap 'onCtrlC' INT
 function onCtrlC() {
     echo ""
-    echo -n "> $ "
+    echo "Bye"
+    exit
 }
 
 function ubuntu_apt_source() {
@@ -29,14 +33,6 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu$is_ports/ $ubuntu_apt_ver-securi
 "
 }
 
-function unix_release() {
-    unix_s=$(uname -s)
-    if [ "$unix_s" = "Linux" ]; then
-        cat /etc/issue | grep -v '^$' | awk '{print $1}'
-    elif [ "$unix_s" = "Darwin" ]; then
-        sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'
-    fi
-}
 
 ###################### color part ###############################################
 function color_red() { echo -n -e "\033[31m"$*"\033[0m\n"; }
@@ -57,12 +53,14 @@ help_help="获取帮助菜单"
 help_install_zsh="安装zsh和oh-my-zsh并替换主题"
 help_switch_package="替换包管理的源为国内"
 help_install_brew="安装Homebrew并替换为国内源"
+help_install_pyenv="安装pyenv并配置PATH"
 function linux_help() {
     color_gold $help_banner
     if [ "$(whoami)" != "root" ]; then color_red "你当前为非 root 用户，可能没有权限执行，请先切换为 root 权限！"; fi
     color_green "[1]:  "$help_switch_package
     color_green "[2]:  "$help_install_zsh
-    
+    color_green "[3]:  "$help_install_pyenv
+
     color_green "[h|help]: "$help_help && color_green "[q|exit]: 退出脚本"
 }
 function darwin_help() {
@@ -73,26 +71,54 @@ function darwin_help() {
     color_green "[h|help]: "$help_help && color_green "[q|exit]: 退出脚本"
 }
 
+function operate_confirm() {
+    echo -n $(color_yellow "$1 [Y/n]  ")
+    read operate
+    operate=$(echo $operate | tr A-Z a-z)
+    if [[ "$operate" = "y" || "$operate" = "" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 ###################### exec part ################################################
 function exec_case() {
-    case $1 in
+    case $unix_s in
     "Linux")
-        case $2 in
+        case $1 in
         1) linux_switch_package ;;
-        2) install_zsh Linux $(unix_release) ;;
+        2) install_zsh ;;
         # Default
         help | h) darwin_help ;; q | exit) color_yellow Bye && exit ;; "") ;; *) color_red "Unknown command: "$2 ;;
         esac
         ;;
     "Darwin")
-        case $2 in
+        case $1 in
         1) install_homebrew ;;
-        2) install_zsh Darwin Darwin ;;
+        2) install_zsh ;;
         # Default
         help | h) darwin_help ;; q | exit) color_yellow Bye && exit ;; "") ;; *) color_red "Unknown command: "$2 ;;
         esac
         ;;
     esac
+}
+
+function detect_aliyun_tencentyun() {
+    r=$(cat /etc/apt/sources.list | grep -E "aliyun|tencent|tuna｜ustc")
+    if [ "$r" = "" ]; then
+        return 1
+    else
+        color_yellow "监测到你当前的镜像源已经是阿里云/腾讯云/清华源/中科大源，我猜你应该不需要再配包管理源了"
+        echo -n "$(color_yellow 是否继续配置包管理？[y/N]) "
+        read operate
+        operate=$(echo $operate | tr A-Z a-z)
+        if [[ "$operate" = "y" ]]; then
+            return 1
+        else
+            return 0
+        fi
+    fi
 }
 
 function install_homebrew() {
@@ -108,36 +134,26 @@ function install_homebrew() {
         brew update
 }
 
-function install_confirm() {
-    echo -n $(color_yellow "$3还没有安装，是否安装？[Y/n]  ")
-    read operate
-    operate=$(echo $operate | tr A-Z a-z)
-    if [[ "$operate" = "y" || "$operate" = "" ]]; then
-        install_software $1 $2 $3
-    else
-        return 1
+function install_software() {
+    if [ "$unix_s" = "Linux" ]; then
+        case $unix_relase in
+        "Kali" | "Ubuntu" | "Debian" | "Raspbian" | 'Pop!_OS') apt install $1 -y ;;
+        esac
+    elif [ "$unix_s" = "Darwin" ]; then
+        brew install $1
     fi
 }
 
-function install_software() {
-    if [ "$1" = "Linux" ]; then
-        case $2 in
-        "Kali" | "Ubuntu" | "Debian" | "Raspbian" | 'Pop!_OS') apt install $3 -y ;;
-        esac
-    elif [ "$2" = "Darwin" ]; then
-        brew install $3
+function install_test() {
+    which $1 > /dev/null
+    if [ $? != 0 ]; then
+        operate_confirm "$1 还没有安装，是否确认安装？" && install_software $1
     fi
 }
 
 function install_zsh() {
-    which git >/dev/null
-    if [ $? != 0 ]; then install_confirm $1 $2 git; fi
-    which curl >/dev/null
-    if [ $? != 0 ]; then install_confirm $1 $2 curl; fi
-    which zsh >/dev/null
-    if [ $? != 0 ]; then install_confirm $1 $2 zsh; fi
-    which vim >/dev/null
-    if [ $? != 0 ]; then install_confirm $1 $2 vim; fi
+    install_test git && install_test curl && install_test zsh && install_test vim
+    if [ $? != 0 ]; then return; fi
     curl https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh -o /tmp/install-3cr4.sh
     sed -ie 's/REPO=${REPO:-ohmyzsh\/ohmyzsh}/REPO=${REPO:-mirrors\/oh-my-zsh}/g' /tmp/install-3cr4.sh
     sed -ie 's/REMOTE=${REMOTE:-https:\/\/github.com\/${REPO}.git}/REMOTE=${REMOTE:-https:\/\/gitee.com\/${REPO}.git}/g' /tmp/install-3cr4.sh
@@ -161,9 +177,11 @@ function install_zsh() {
 
     color_green "正在启用扩展..."
     if [ "$(sed -n '/^plugins=(git)/p' ~/.zshrc)" = "" ]; then
-        echo -n $(color_yellow "你已经修改过 .zshrc 的插件了，请手动添加 z sudo！(Press ENTER to continue)")
-        read
-        vim ~/.zshrc "+/^plugins"
+        echo -n $(color_yellow "你已经修改过 .zshrc 的插件了，请手动添加 z sudo！(Press y to open vim or ENTER to continue)")
+        read ys
+        if [ "$ys" = "y" ]; then
+            vim ~/.zshrc "+/^plugins"
+        fi
     else
         sed -ie 's/plugins=(git)/plugins=(git z sudo)/g' ~/.zshrc
     fi
@@ -172,7 +190,7 @@ function install_zsh() {
 }
 
 function linux_switch_package() {
-    case $(unix_release) in
+    case $unix_release in
     "Kali") # Kali脚本目前只支持x86架构的
         key=$(cat /etc/apt/sources.list | awk '{print $1}' | head -n 1)
         if [ "$key" != "#script" ]; then
@@ -187,6 +205,7 @@ function linux_switch_package() {
     "Ubuntu")
         key=$(cat /etc/apt/sources.list | awk '{print $1}' | head -n 1)
         if [ "$key" != "#script" ]; then
+            detect_aliyun_tencentyun && return
             echo "正在备份原 /etc/apt/sources.list ..."
             cp /etc/apt/sources.list /etc/apt/sources.list.old
 
@@ -214,7 +233,6 @@ function linux_switch_package() {
 }
 
 function main() {
-    unix_s=$(uname -s)
     if [ "$unix_s" = "Linux" ]; then
         linux_help
     elif [ "$unix_s" = "Darwin" ]; then
@@ -232,7 +250,7 @@ function main() {
             echo "Bye"
             break
         fi
-        exec_case $unix_s $cmdline
+        exec_case $cmdline
     done
 }
 
