@@ -227,7 +227,7 @@ function linux_switch_package() {
         apt update
         ;;
     *)
-        color_red 不支持的发行版：$(unix_release)
+        color_red "不支持的发行版：$unix_release"
         ;;
     esac
 }
