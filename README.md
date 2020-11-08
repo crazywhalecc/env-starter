@@ -7,8 +7,7 @@
 bash -c "$(curl -fsSL https://api.zhamao.xin/tools/env.sh)"
 
 # 下载方式 2 (因为 githubusercontent 被墙了，所以只能这么下)
-git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && chmod +x env.sh && mv env.sh ../ && cd ../ && rm -rf env-starter/
-./env.sh
+git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && chmod +x env.sh && mv env.sh ../ && cd ../ && rm -rf env-starter/ && ./env.sh
 ```
 
 然后根据提示直接使用即可。
@@ -27,3 +26,6 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 - [ ] Arch Linux
 - [ ] Alpine
 - [ ] Deepin
+
+## 特色（虽然没啥用）
+- Ubuntu 包管理替换时检测如果系统是阿里云或腾讯云的镜像则询问用户是否替换
