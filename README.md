@@ -3,7 +3,7 @@
 
 ## 使用
 ```bash
-# 下载方式 1 (可能更新有延迟，但是国内可访问)
+# 下载方式 1 (国内可访问)
 bash -c "$(curl -fsSL https://api.zhamao.xin/tools/env.sh)"
 
 # 下载方式 2 (因为 githubusercontent 被墙了，所以只能这么下)
