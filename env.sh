@@ -54,12 +54,13 @@ help_install_zsh="安装zsh和oh-my-zsh并替换主题"
 help_switch_package="替换包管理的源为国内"
 help_install_brew="安装Homebrew并替换为国内源"
 help_install_pyenv="安装pyenv并配置PATH"
+help_neofetch="运行neofetch"
 function linux_help() {
     color_gold $help_banner
     if [ "$(whoami)" != "root" ]; then color_red "你当前为非 root 用户，可能没有权限执行，请先切换为 root 权限！"; fi
     color_green "[1]:  "$help_switch_package
     color_green "[2]:  "$help_install_zsh
-    color_green "[3]:  "$help_install_pyenv
+    color_green "[3]:  "$help_neofetch
 
     color_green "[h|help]: "$help_help && color_green "[q|exit]: 退出脚本"
 }
@@ -67,6 +68,7 @@ function darwin_help() {
     color_gold $help_banner
     color_green "[1]:  "$help_install_brew
     color_green "[2]:  "$help_install_zsh
+    color_green "[3]:  "$help_neofetch
 
     color_green "[h|help]: "$help_help && color_green "[q|exit]: 退出脚本"
 }
@@ -82,6 +84,10 @@ function operate_confirm() {
     fi
 }
 
+function run_neofetch() {
+    curl -o /tmp/neofetch -s https://gitee.com/mirrors/neofetch/raw/master/neofetch && chmod +x /tmp/neofetch && /tmp/neofetch && rm /tmp/neofetch
+}
+
 ###################### exec part ################################################
 function exec_case() {
     case $unix_s in
@@ -89,14 +95,16 @@ function exec_case() {
         case $1 in
         1) linux_switch_package ;;
         2) install_zsh ;;
+        3) run_neofetch ;;
         # Default
-        help | h) darwin_help ;; q | exit) color_yellow Bye && exit ;; "") ;; *) color_red "Unknown command: "$2 ;;
+        help | h) linux_help ;; q | exit) color_yellow Bye && exit ;; "") ;; *) color_red "Unknown command: "$2 ;;
         esac
         ;;
     "Darwin")
         case $1 in
         1) install_homebrew ;;
         2) install_zsh ;;
+        3) run_neofetch ;;
         # Default
         help | h) darwin_help ;; q | exit) color_yellow Bye && exit ;; "") ;; *) color_red "Unknown command: "$2 ;;
         esac
