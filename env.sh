@@ -249,7 +249,7 @@ function main() {
         color_red "Unknown unix operating system name: "$unix_s
         return 1
     fi
-    color_gray "Powered by 缝合怪-crazywhale"
+    color_gray "Powered by 缝合怪crazywhale"
     while true; do
         echo -n "> $ "
         read cmdline
