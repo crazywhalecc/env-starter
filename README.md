@@ -3,8 +3,11 @@
 
 ## 使用
 ```bash
-# 下载方式 1 (国内可访问)
+# 下载方式 1 (国内可访问，但可能更新有延迟)
 bash -c "$(curl -fsSL https://api.zhamao.xin/tools/env.sh)"
+
+# 下载方式 2 (GitHub Pages)
+bash -c "$(curl -fsSL http://env.crazywhale.cn/env.sh)"
 
 # 下载方式 2 (因为 githubusercontent 被墙了，所以只能这么下)
 git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && chmod +x env.sh && mv env.sh ../ && cd ../ && rm -rf env-starter/ && ./env.sh
@@ -16,6 +19,7 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 - [X] Linux 发行版的包管理一键替换清华源
 - [X] macOS Homebrew 一键从国内清华源安装和替换仓库地址
 - [X] 一键安装 zsh + oh-my-zsh 并添加插件 z sudo 和下载 zsh-autosuggestions 自动补全
+- [X] 在线运行 `neofetch` 查看系统信息
 - [ ] 一键安装 pyenv 并配置 PATH 等操作
 - [ ] 一键安装 LNMP 或其中的一项或几项，可手动选安装套件
 - [ ] Hack Things (自动安装自用的一些渗透工具集)
@@ -25,6 +29,7 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 ## 包管理替换支持的发行版
 - [X] Ubuntu 12.04 ~ 20.04 (x86_64 / aarch64)
 - [X] Kali (x86_64)
+- [X] Termux (with Android)
 - [ ] Pop!_OS (x86_64)
 - [ ] Debian
 - [ ] Raspbian
@@ -34,3 +39,4 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 
 ## 特色（虽然没啥用）
 - Ubuntu 包管理替换时检测如果系统是阿里云或腾讯云的镜像则询问用户是否替换
+- 支持 termux 环境
