@@ -54,7 +54,7 @@ help_install_zsh="安装zsh和oh-my-zsh并替换主题"
 help_switch_package="替换包管理的源为国内"
 help_install_brew="安装Homebrew并替换为国内源"
 help_install_pyenv="安装pyenv并配置PATH"
-help_neofetch="运行neofetch"
+help_neofetch="在线运行neofetch"
 function linux_help() {
     color_gold $help_banner
     if [ "$(whoami)" != "root" ]; then color_red "你当前为非 root 用户，可能没有权限执行，请先切换为 root 权限！"; fi
@@ -144,8 +144,8 @@ function install_homebrew() {
 
 function install_software() {
     if [ "$unix_s" = "Linux" ]; then
-        case $unix_relase in
-        "Kali" | "Ubuntu" | "Debian" | "Raspbian" | 'Pop!_OS') apt install $1 -y ;;
+        case $unix_release in
+        "Kali" | "Ubuntu" | "Debian" | "Raspbian" | 'Pop!_OS') sudo apt install $1 -y ;;
         esac
     elif [ "$unix_s" = "Darwin" ]; then
         brew install $1
@@ -160,7 +160,7 @@ function install_test() {
 }
 
 function install_zsh() {
-    install_test git && install_test curl && install_test zsh && install_test vim
+    install_test git && install_test curl && install_test zsh && install_test vim && install_test sl
     if [ $? != 0 ]; then return; fi
     curl https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh -o /tmp/install-3cr4.sh
     sed -ie 's/REPO=${REPO:-ohmyzsh\/ohmyzsh}/REPO=${REPO:-mirrors\/oh-my-zsh}/g' /tmp/install-3cr4.sh
@@ -203,36 +203,36 @@ function linux_switch_package() {
         key=$(cat /etc/apt/sources.list | awk '{print $1}' | head -n 1)
         if [ "$key" != "#script" ]; then
             echo "正在备份原 /etc/apt/sources.list ..."
-            cp /etc/apt/sources.list /etc/apt/sources.list.old
+            sudo cp /etc/apt/sources.list /etc/apt/sources.list.old
             a_source="#script generated\ndeb $kali_apt_source kali-rolling main contrib non-free\ndeb-src $kali_apt_source kali-rolling main contrib non-free"
-            echo -e $a_source >/etc/apt/sources.list
+            echo -e $a_source | sudo tee /etc/apt/sources.list
             color_green 成功替换为国内，正在update
         fi
-        apt update
+        sudo apt update
         ;;
     "Ubuntu")
         key=$(cat /etc/apt/sources.list | awk '{print $1}' | head -n 1)
         if [ "$key" != "#script" ]; then
             detect_aliyun_tencentyun && return
             echo "正在备份原 /etc/apt/sources.list ..."
-            cp /etc/apt/sources.list /etc/apt/sources.list.old
+            sudo cp /etc/apt/sources.list /etc/apt/sources.list.old
 
             # 判断ubuntu版本和架构
             if [ "$(arch)" = "x86_64" ]; then # 当前是x86架构
                 ubuntu_apt_ver=$(lsb_release -c | awk '{print $2}')
                 is_ports=""
-                ubuntu_apt_source >/etc/apt/sources.list
+                ubuntu_apt_source | sudo tee /etc/apt/sources.list
             elif [ "$(arch)" = "aarch64" ]; then
                 ubuntu_apt_ver=$(lsb_release -c | awk '{print $2}')
                 is_ports="-ports"
-                ubuntu_ports_apt_source >/etc/apt/sources.list
+                ubuntu_ports_apt_source | sudo tee /etc/apt/sources.list
             else
                 color_red "当前架构暂不支持！"
                 break
             fi
             color_green 成功替换为国内，正在update
         fi
-        apt update
+        sudo apt update
         ;;
     *)
         color_red "不支持的发行版：$unix_release"
