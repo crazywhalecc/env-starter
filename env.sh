@@ -2,26 +2,27 @@
 
 kali_apt_source="http://mirrors.tuna.tsinghua.edu.cn/kali"
 ubuntu_apt_ver="xenial"
+centos_ver=""
 is_ports=""
 tools_url="http://env.crazywhale.cn"
 tmp_dir="/tmp"
 
 unix_s=$(uname -s)
-
-function _get_release() {
+unix_release=$(
     if [ "$unix_s" = "Linux" ]; then 
         echo $HOME | grep com.termux > /dev/null
         if [ $? == 0 ]; then
             echo "termux"
+        elif [ "$(cat /etc/redhat-release | awk '{print $1}' | grep -v '^$')" = "CentOS" ]; then
+            echo "CentOS"
         else
-            cat /etc/issue | grep -v '^$' | awk '{print $1}'; 
+            cat /etc/issue | grep -v '^$' | awk '{print $1}'
         fi
     elif [ "$unix_s" = "Darwin" ]; then 
-        sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'; 
+        sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'
     fi
-}
-# unix_release=$(if [ "$unix_s" = "Linux" ]; then cat /etc/issue | grep -v '^$' | awk '{print $1}'; elif [ "$unix_s" = "Darwin" ]; then sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'; fi)
-unix_release=$(_get_release)
+)
+
 trap 'onCtrlC' INT
 function onCtrlC() {
     echo ""
@@ -29,10 +30,12 @@ function onCtrlC() {
     exit
 }
 
-if [ "$unix_release" = "termux" ]; then
-    tmp_dir=$(cd "$HOME/../usr/tmp" && pwd)
-    echo "临时目录切换：$tmp_dir"
-fi
+# 一些特殊的发行版进行的操作
+case $unix_release in 
+"termux") tmp_dir=$(cd "$HOME/../usr/tmp" && pwd) ; echo "临时目录切换：$tmp_dir" ;;
+"CentOS") centos_ver=$(cat /etc/redhat-release | sed -r 's/.* ([0-9]+)\..*/\1/') ;;
+"Mac OS X") unix_release=$unix_release"-"$(sw_vers -productVersion)
+esac
 
 function ubuntu_apt_source() {
     echo "#script generated
@@ -66,7 +69,7 @@ function color_gray() { echo -n -e "\033[38;5;59m"$*"\033[0m\n"; }
 function color_lightlightblue() { echo -n -e "\033[38;5;63m"$*"\033[0m\n"; }
 
 ###################### help part ################################################
-help_banner="====== 当前系统 $unix_release-"$(uname -m)"("$(whoami)") ======"
+help_banner="====== 当前系统 $unix_release$centos_ver-"$(uname -m)"("$(whoami)") ======"
 help_help="获取帮助菜单"
 help_install_zsh="安装zsh和oh-my-zsh并替换主题"
 help_switch_package="替换包管理的源为国内"
@@ -75,7 +78,7 @@ help_install_pyenv="安装pyenv并配置PATH"
 help_neofetch="在线运行neofetch"
 function linux_help() {
     color_gold $help_banner
-    if [ "$(whoami)" != "root" ]; then color_red "你当前为非 root 用户，可能没有权限执行，请先切换为 root 权限！"; fi
+    if [ "$(whoami)" != "root" ]; then color_yellow "你当前为非 root 用户，在执行一些包安装操作的时候可能会使用 sudo 命令"; fi
     color_green "[1]:  "$help_switch_package
     color_green "[2]:  "$help_install_zsh
     color_green "[3]:  "$help_neofetch
@@ -165,6 +168,7 @@ function install_software() {
         case $unix_release in
         "Kali" | "Ubuntu" | "Debian" | "Raspbian" | 'Pop!_OS') sudo apt install $1 -y ;;
         "termux") pkg install $1 -y ;;
+        "CentOS") sudo yum install $1 -y ;;
         esac
     elif [ "$unix_s" = "Darwin" ]; then
         brew install $1
@@ -258,6 +262,12 @@ function linux_switch_package() {
         sed -i 's@^\(deb.*games stable\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux/game-packages-24 games stable@' $PREFIX/etc/apt/sources.list.d/game.list
         sed -i 's@^\(deb.*science stable\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux/science-packages-24 science stable@' $PREFIX/etc/apt/sources.list.d/science.list
         apt update
+        ;;
+    "CentOS")
+        operate_confirm "CentOS 貌似默认会自动根据位置寻找合适的镜像站，不需要手动换源，是否继续？"
+        if [ $? != 0 ]; then return; fi
+        echo "正在备份原 /etc/yum.repos.d/CentOS-Base.repo"
+        sudo cp /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
         ;;
     *)
         color_red "不支持的发行版：$unix_release"
