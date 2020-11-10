@@ -171,7 +171,7 @@ function install_homebrew() {
 function install_software() {
     if [ "$unix_s" = "Linux" ]; then
         case $unix_release in
-        "Kali" | "Ubuntu" | "Debian" | "Raspbian" | 'Pop!_OS') sudo apt install $1 -y ;;
+        "Kali" | "Ubuntu" | "Debian" | "Raspbian" | 'Pop!_OS') sudo apt-get install $1 -y ;;
         "termux") pkg install $1 -y ;;
         "CentOS") sudo yum install $1 -y ;;
         esac
@@ -236,7 +236,7 @@ function linux_switch_package() {
             echo -e $a_source | sudo tee /etc/apt/sources.list
             color_green 成功替换为国内，正在update
         fi
-        sudo apt update
+        sudo apt-get update
         ;;
     "Ubuntu")
         key=$(cat /etc/apt/sources.list | awk '{print $1}' | head -n 1)
@@ -246,7 +246,7 @@ function linux_switch_package() {
             sudo cp /etc/apt/sources.list /etc/apt/sources.list.old
 
             # 判断ubuntu版本和架构
-            if [ "$(arch)" = "x86_64" ]; then # 当前是x86架构
+            if [[ "$(arch)" = "x86_64" || "$(arch)" = "i686" ]]; then # 当前是x86架构
                 ubuntu_apt_ver=$(lsb_release -c | awk '{print $2}')
                 is_ports=""
                 ubuntu_apt_source | sudo tee /etc/apt/sources.list
@@ -260,7 +260,7 @@ function linux_switch_package() {
             fi
             color_green 成功替换为国内，正在update
         fi
-        sudo apt update
+        sudo apt-get update
         ;;
     "termux")
         sed -i 's@^\(deb.*stable main\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux/termux-packages-24 stable main@' $PREFIX/etc/apt/sources.list
