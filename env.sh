@@ -4,6 +4,7 @@ kali_apt_source="http://mirrors.tuna.tsinghua.edu.cn/kali"
 ubuntu_apt_ver="xenial"
 is_ports=""
 tools_url="http://124.70.24.97/tools"
+tmp_dir="/tmp"
 
 unix_s=$(uname -s)
 
@@ -11,6 +12,7 @@ function _get_release() {
     if [ "$unix_s" = "Linux" ]; then 
         echo $HOME | grep com.termux > /dev/null
         if [ $? == 0 ]; then
+            tmp_dir="$HOME/../usr/tmp"
             echo "termux"
         else
             cat /etc/issue | grep -v '^$' | awk '{print $1}'; 
@@ -97,7 +99,7 @@ function operate_confirm() {
 }
 
 function run_neofetch() {
-    curl -o /tmp/neofetch -s https://gitee.com/mirrors/neofetch/raw/master/neofetch && chmod +x /tmp/neofetch && /tmp/neofetch && rm /tmp/neofetch
+    curl -o $tmp_dir/neofetch -s https://gitee.com/mirrors/neofetch/raw/master/neofetch && chmod +x $tmp_dir/neofetch && $tmp_dir/neofetch && rm $tmp_dir/neofetch
 }
 
 ###################### exec part ################################################
