@@ -19,7 +19,7 @@ function _get_release() {
         sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'; 
     fi
 }
-unix_release=$(if [ "$unix_s" = "Linux" ]; then cat /etc/issue | grep -v '^$' | awk '{print $1}'; elif [ "$unix_s" = "Darwin" ]; then sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'; fi)
+# unix_release=$(if [ "$unix_s" = "Linux" ]; then cat /etc/issue | grep -v '^$' | awk '{print $1}'; elif [ "$unix_s" = "Darwin" ]; then sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'; fi)
 unix_release=$(_get_release)
 trap 'onCtrlC' INT
 function onCtrlC() {
