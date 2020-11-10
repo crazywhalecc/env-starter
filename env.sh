@@ -3,7 +3,7 @@
 kali_apt_source="http://mirrors.tuna.tsinghua.edu.cn/kali"
 ubuntu_apt_ver="xenial"
 is_ports=""
-tools_url="http://124.70.24.97/tools"
+tools_url="http://env.crazywhale.cn"
 
 unix_s=$(uname -s)
 unix_release=$(if [ "$unix_s" = "Linux" ]; then cat /etc/issue | grep -v '^$' | awk '{print $1}'; elif [ "$unix_s" = "Darwin" ]; then sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'; fi)
