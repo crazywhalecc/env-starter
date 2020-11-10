@@ -30,7 +30,8 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 - [X] Ubuntu 12.04 ~ 20.04 (x86_64 / aarch64)
 - [X] Kali (x86_64)
 - [X] Termux (with Android)
-- [ ] Pop!_OS (x86_64)
+- [ ] CentOS
+- [ ] Pop!_OS
 - [ ] Debian
 - [ ] Raspbian
 - [ ] Arch Linux
