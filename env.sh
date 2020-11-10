@@ -25,9 +25,7 @@ unix_release=$(
 
 trap 'onCtrlC' INT
 function onCtrlC() {
-    echo ""
-    echo "Bye"
-    exit
+    echo "" && echo "Bye" && exit
 }
 
 # 一些特殊的发行版进行的操作
@@ -69,7 +67,7 @@ function color_gray() { echo -n -e "\033[38;5;59m"$*"\033[0m\n"; }
 function color_lightlightblue() { echo -n -e "\033[38;5;63m"$*"\033[0m\n"; }
 
 ###################### help part ################################################
-help_banner="====== 当前系统 $unix_release$centos_ver-"$(uname -m)"("$(whoami)") ======"
+help_banner="====== 当前系统 $unix_release-"$(uname -m)"("$(whoami)") ======"
 help_help="获取帮助菜单"
 help_install_zsh="安装zsh和oh-my-zsh并替换主题"
 help_switch_package="替换包管理的源为国内"
@@ -106,7 +104,14 @@ function operate_confirm() {
 }
 
 function run_neofetch() {
-    curl -o $tmp_dir/neofetch -s https://gitee.com/mirrors/neofetch/raw/master/neofetch && chmod +x $tmp_dir/neofetch && $tmp_dir/neofetch && rm $tmp_dir/neofetch
+    if [ ! -x "$tmp_dir/neofetch" ]; then
+        curl -o $tmp_dir/neofetch -s https://gitee.com/mirrors/neofetch/raw/master/neofetch && chmod +x $tmp_dir/neofetch 
+    fi
+    if [ ! -x "$tmp_dir/neofetch" ]; then
+        color_red "neofetch 下载失败！"
+    else
+        $tmp_dir/neofetch
+    fi
 }
 
 ###################### exec part ################################################
