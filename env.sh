@@ -3,9 +3,22 @@
 kali_apt_source="http://mirrors.tuna.tsinghua.edu.cn/kali"
 ubuntu_apt_ver="xenial"
 is_ports=""
-tools_url="http://env.crazywhale.cn"
+tools_url="http://124.70.24.97/tools"
 
 unix_s=$(uname -s)
+
+function _get_release() {
+    if [ "$unix_s" = "Linux" ]; then 
+        echo $HOME | grep com.termux > /dev/null
+        if [ $? == 0 ]; then
+            echo "termux"
+        else
+            cat /etc/issue | grep -v '^$' | awk '{print $1}'; 
+        fi
+    elif [ "$unix_s" = "Darwin" ]; then 
+        sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'; 
+    fi
+}
 unix_release=$(if [ "$unix_s" = "Linux" ]; then cat /etc/issue | grep -v '^$' | awk '{print $1}'; elif [ "$unix_s" = "Darwin" ]; then sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'; fi)
 
 trap 'onCtrlC' INT
@@ -32,7 +45,6 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu$is_ports/ $ubuntu_apt_ver-securi
 # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu$is_ports/ $ubuntu_apt_ver-proposed main restricted universe multiverse
 "
 }
-
 
 ###################### color part ###############################################
 function color_red() { echo -n -e "\033[31m"$*"\033[0m\n"; }
@@ -153,7 +165,7 @@ function install_software() {
 }
 
 function install_test() {
-    which $1 > /dev/null
+    which $1 >/dev/null
     if [ $? != 0 ]; then
         operate_confirm "$1 还没有安装，是否确认安装？" && install_software $1
     fi
