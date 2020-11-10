@@ -3,7 +3,7 @@
 kali_apt_source="http://mirrors.tuna.tsinghua.edu.cn/kali"
 ubuntu_apt_ver="xenial"
 is_ports=""
-tools_url="http://124.70.24.97/tools"
+tools_url="http://env.crazywhale.cn"
 tmp_dir="/tmp"
 
 unix_s=$(uname -s)
@@ -12,7 +12,6 @@ function _get_release() {
     if [ "$unix_s" = "Linux" ]; then 
         echo $HOME | grep com.termux > /dev/null
         if [ $? == 0 ]; then
-            tmp_dir="$HOME/../usr/tmp"
             echo "termux"
         else
             cat /etc/issue | grep -v '^$' | awk '{print $1}'; 
@@ -29,6 +28,11 @@ function onCtrlC() {
     echo "Bye"
     exit
 }
+
+if [ "$unix_release" = "termux" ]; then
+    tmp_dir=$(cd "$HOME/../usr/tmp" && pwd)
+    echo "临时目录切换：$tmp_dir"
+fi
 
 function ubuntu_apt_source() {
     echo "#script generated
@@ -160,6 +164,7 @@ function install_software() {
     if [ "$unix_s" = "Linux" ]; then
         case $unix_release in
         "Kali" | "Ubuntu" | "Debian" | "Raspbian" | 'Pop!_OS') sudo apt install $1 -y ;;
+        "termux") pkg install $1 -y ;;
         esac
     elif [ "$unix_s" = "Darwin" ]; then
         brew install $1
@@ -176,19 +181,19 @@ function install_test() {
 function install_zsh() {
     install_test git && install_test curl && install_test zsh && install_test vim && install_test sl
     if [ $? != 0 ]; then return; fi
-    curl https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh -o /tmp/install-3cr4.sh
-    sed -ie 's/REPO=${REPO:-ohmyzsh\/ohmyzsh}/REPO=${REPO:-mirrors\/oh-my-zsh}/g' /tmp/install-3cr4.sh
-    sed -ie 's/REMOTE=${REMOTE:-https:\/\/github.com\/${REPO}.git}/REMOTE=${REMOTE:-https:\/\/gitee.com\/${REPO}.git}/g' /tmp/install-3cr4.sh
-    chmod +x /tmp/install-3cr4.sh
-    /tmp/install-3cr4.sh
+    curl https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh -o $tmp_dir/install-3cr4.sh
+    sed -ie 's/REPO=${REPO:-ohmyzsh\/ohmyzsh}/REPO=${REPO:-mirrors\/oh-my-zsh}/g' $tmp_dir/install-3cr4.sh
+    sed -ie 's/REMOTE=${REMOTE:-https:\/\/github.com\/${REPO}.git}/REMOTE=${REMOTE:-https:\/\/gitee.com\/${REPO}.git}/g' $tmp_dir/install-3cr4.sh
+    chmod +x $tmp_dir/install-3cr4.sh
+    $tmp_dir/install-3cr4.sh
     cd ~/.oh-my-zsh
     if [ $? != 0 ]; then
         color_red "oh-my-zsh安装失败！"
     fi
     cd ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/
     if [ $? != 0 ]; then
-        curl $tools_url/archive/zsh-autosuggestions.tar.gz -o /tmp/zsh-autosuggestions.tar.gz &&
-            cd /tmp && tar -zxvf zsh-autosuggestions.tar.gz &&
+        curl $tools_url/archive/zsh-autosuggestions.tar.gz -o $tmp_dir/zsh-autosuggestions.tar.gz &&
+            cd $tmp_dir && tar -zxvf zsh-autosuggestions.tar.gz &&
             mv zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/
     fi
     color_green "正在更换主题为 daveverwer"
@@ -247,6 +252,12 @@ function linux_switch_package() {
             color_green 成功替换为国内，正在update
         fi
         sudo apt update
+        ;;
+    "termux")
+        sed -i 's@^\(deb.*stable main\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux/termux-packages-24 stable main@' $PREFIX/etc/apt/sources.list
+        sed -i 's@^\(deb.*games stable\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux/game-packages-24 games stable@' $PREFIX/etc/apt/sources.list.d/game.list
+        sed -i 's@^\(deb.*science stable\)$@#\1\ndeb https://mirrors.tuna.tsinghua.edu.cn/termux/science-packages-24 science stable@' $PREFIX/etc/apt/sources.list.d/science.list
+        apt update
         ;;
     *)
         color_red "不支持的发行版：$unix_release"
