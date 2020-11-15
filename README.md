@@ -42,3 +42,6 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 - Ubuntu 包管理替换时检测如果系统是阿里云或腾讯云的镜像则询问用户是否替换
 - 支持 termux 环境
 - 使用方向键快速选择，比较酷炫（感谢 @kahkhang 开发的 [Inquirer.sh](https://github.com/kahkhang/Inquirer.sh)）
+
+## 效果
+![](https://api.zhamao.xin/img/preview_env-starter.gif)
