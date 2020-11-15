@@ -1,16 +1,12 @@
 #!/bin/bash
 
-kali_apt_source="http://mirrors.tuna.tsinghua.edu.cn/kali"
-ubuntu_apt_ver="xenial"
-centos_ver=""
-is_ports=""
+tmp_dir="/tmp" # 临时目录
 tools_url="http://env.crazywhale.cn"
-tmp_dir="/tmp"
-
 unix_s=$(uname -s)
+initial_download_cmdline="curl"
 unix_release=$(
-    if [ "$unix_s" = "Linux" ]; then 
-        echo $HOME | grep com.termux > /dev/null
+    if [ "$unix_s" = "Linux" ]; then
+        echo $HOME | grep com.termux >/dev/null
         if [ $? == 0 ]; then
             echo "termux"
         elif [ "$(cat /etc/redhat-release | awk '{print $1}' | grep -v '^$')" = "CentOS" ]; then
@@ -18,10 +14,16 @@ unix_release=$(
         else
             cat /etc/issue | grep -v '^$' | awk '{print $1}'
         fi
-    elif [ "$unix_s" = "Darwin" ]; then 
+    elif [ "$unix_s" = "Darwin" ]; then
         sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'
     fi
 )
+unix_release=$(echo $unix_release | xargs)
+help_banner="====== $unix_release-"$(uname -m)"("$(whoami)") ======"
+kali_apt_source="http://mirrors.tuna.tsinghua.edu.cn/kali"
+ubuntu_apt_ver="xenial"
+centos_ver=""
+is_ports=""
 
 trap 'onCtrlC' INT
 function onCtrlC() {
@@ -29,12 +31,56 @@ function onCtrlC() {
 }
 
 # 一些特殊的发行版进行的操作
-case $unix_release in 
-"termux") tmp_dir=$(cd "$HOME/../usr/tmp" && pwd) ; echo "临时目录切换：$tmp_dir" ;;
+case $unix_release in
+"termux") tmp_dir=$(cd "$HOME/../usr/tmp" && pwd) ;;
 "CentOS") centos_ver=$(cat /etc/redhat-release | sed -r 's/.* ([0-9]+)\..*/\1/') ;;
-"Mac OS X") unix_release=$unix_release"-"$(sw_vers -productVersion)
+"Mac OS X") unix_release=$unix_release"-"$(sw_vers -productVersion) ;;
 esac
 
+if command -v curl >/dev/null 2>&1; then initial_download_cmdline="curl"; else initial_download_cmdline="wget"; fi
+
+function down_file() {
+    if [ "$initial_download_cmdline" = "curl" ]; then curl -fsSL $1 -o $2; else wget -O $2 $1; fi
+}
+
+_lib_list=$tmp_dir"/list_input_a384.sh"
+if [ ! -f "$_lib_list" ]; then
+    _lib_list="./lib/list_input.sh"
+    if [ ! -f "$_lib_list" ]; then
+        _lib_list=$tmp_dir"/list_input_a384.sh"
+        down_file $tools_url/lib/list_input.sh $_lib_list
+    fi
+fi
+source $_lib_list
+
+###################### tools part ###############################################
+function install_test() {
+    which $1 >/dev/null
+    if [ $? != 0 ]; then
+        operate_confirm "$1 还没有安装，是否确认安装？" && install_software $1
+    fi
+}
+function install_software() {
+    if [ "$unix_s" = "Linux" ]; then
+        case $unix_release in
+        "Kali" | "Ubuntu" | "Debian" | "Raspbian" | 'Pop!_OS') sudo apt-get install $1 -y ;;
+        "termux") pkg install $1 -y ;;
+        "CentOS") sudo yum install $1 -y ;;
+        esac
+    elif [ "$unix_s" = "Darwin" ]; then
+        brew install $1
+    fi
+}
+function operate_confirm() {
+    echo -n $(color_yellow "$1 [Y/n]  ")
+    read operate
+    operate=$(echo $operate | tr A-Z a-z)
+    if [[ "$operate" = "y" || "$operate" = "" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
 function ubuntu_apt_source() {
     echo "#script generated
 # 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
@@ -66,41 +112,18 @@ function color_gold() { echo -n -e "\033[38;5;214m"$*"\033[0m\n"; }
 function color_gray() { echo -n -e "\033[38;5;59m"$*"\033[0m\n"; }
 function color_lightlightblue() { echo -n -e "\033[38;5;63m"$*"\033[0m\n"; }
 
-###################### help part ################################################
-help_banner="====== 当前系统 $unix_release-"$(uname -m)"("$(whoami)") ======"
-help_help="获取帮助菜单"
-help_install_zsh="安装zsh和oh-my-zsh并替换主题"
-help_switch_package="替换包管理的源为国内"
-help_install_brew="安装Homebrew并替换为国内源"
-help_install_pyenv="安装pyenv并配置PATH"
-help_neofetch="在线运行neofetch"
-function linux_help() {
-    color_gold $help_banner
-    if [ "$(whoami)" != "root" ]; then color_yellow "你当前为非 root 用户，在执行一些包安装操作的时候可能会使用 sudo 命令"; fi
-    color_green "[1]:  "$help_switch_package
-    color_green "[2]:  "$help_install_zsh
-    color_green "[3]:  "$help_neofetch
-
-    color_green "[h|help]: "$help_help && color_green "[q|exit]: 退出脚本"
-}
-function darwin_help() {
-    color_gold $help_banner
-    color_green "[1]:  "$help_install_brew
-    color_green "[2]:  "$help_install_zsh
-    color_green "[3]:  "$help_neofetch
-
-    color_green "[h|help]: "$help_help && color_green "[q|exit]: 退出脚本"
-}
-
-function operate_confirm() {
-    echo -n $(color_yellow "$1 [Y/n]  ")
-    read operate
-    operate=$(echo $operate | tr A-Z a-z)
-    if [[ "$operate" = "y" || "$operate" = "" ]]; then
-        return 0
-    else
-        return 1
-    fi
+####################### 功能函数 part #############################################
+function install_homebrew() {
+    cd /tmp
+    git clone https://github.com/Homebrew/install.git
+    sed -ie 's/BREW_REPO="https:\/\/github.com\/Homebrew\/brew"/BREW_REPO="https:\/\/mirrors.tuna.tsinghua.edu.cn\/git\/homebrew\/brew.git"/g' install/install.sh
+    HOMEBREW_CORE_GIT_REMOTE=https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git bash install/install.sh &&
+        git -C "$(brew --repo)" remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git &&
+        git -C "$(brew --repo homebrew/core)" remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git &&
+        git -C "$(brew --repo homebrew/cask)" remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-cask.git 2>/dev/null &&
+        git -C "$(brew --repo homebrew/cask-fonts)" remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-cask-fonts.git 2>/dev/null &&
+        git -C "$(brew --repo homebrew/cask-drivers)" remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-cask-drivers.git 2>/dev/null &&
+        brew update
 }
 
 function run_neofetch() {
@@ -112,30 +135,6 @@ function run_neofetch() {
     else
         $tmp_dir/neofetch
     fi
-}
-
-###################### exec part ################################################
-function exec_case() {
-    case $unix_s in
-    "Linux")
-        case $1 in
-        1) linux_switch_package ;;
-        2) install_zsh ;;
-        3) run_neofetch ;;
-        # Default
-        help | h) linux_help ;; q | exit) color_yellow Bye && exit ;; "") ;; *) color_red "Unknown command: "$2 ;;
-        esac
-        ;;
-    "Darwin")
-        case $1 in
-        1) install_homebrew ;;
-        2) install_zsh ;;
-        3) run_neofetch ;;
-        # Default
-        help | h) darwin_help ;; q | exit) color_yellow Bye && exit ;; "") ;; *) color_red "Unknown command: "$2 ;;
-        esac
-        ;;
-    esac
 }
 
 function detect_aliyun_tencentyun() {
@@ -153,76 +152,6 @@ function detect_aliyun_tencentyun() {
             return 0
         fi
     fi
-}
-
-function install_homebrew() {
-    cd /tmp
-    git clone https://github.com/Homebrew/install.git
-    sed -ie 's/BREW_REPO="https:\/\/github.com\/Homebrew\/brew"/BREW_REPO="https:\/\/mirrors.tuna.tsinghua.edu.cn\/git\/homebrew\/brew.git"/g' install/install.sh
-    HOMEBREW_CORE_GIT_REMOTE=https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git bash install/install.sh &&
-        git -C "$(brew --repo)" remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git &&
-        git -C "$(brew --repo homebrew/core)" remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git &&
-        git -C "$(brew --repo homebrew/cask)" remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-cask.git 2>/dev/null &&
-        git -C "$(brew --repo homebrew/cask-fonts)" remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-cask-fonts.git 2>/dev/null &&
-        git -C "$(brew --repo homebrew/cask-drivers)" remote set-url origin https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-cask-drivers.git 2>/dev/null &&
-        brew update
-}
-
-function install_software() {
-    if [ "$unix_s" = "Linux" ]; then
-        case $unix_release in
-        "Kali" | "Ubuntu" | "Debian" | "Raspbian" | 'Pop!_OS') sudo apt-get install $1 -y ;;
-        "termux") pkg install $1 -y ;;
-        "CentOS") sudo yum install $1 -y ;;
-        esac
-    elif [ "$unix_s" = "Darwin" ]; then
-        brew install $1
-    fi
-}
-
-function install_test() {
-    which $1 >/dev/null
-    if [ $? != 0 ]; then
-        operate_confirm "$1 还没有安装，是否确认安装？" && install_software $1
-    fi
-}
-
-function install_zsh() {
-    install_test git && install_test curl && install_test zsh && install_test vim && install_test sl
-    if [ $? != 0 ]; then return; fi
-    curl https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh -o $tmp_dir/install-3cr4.sh
-    sed -ie 's/REPO=${REPO:-ohmyzsh\/ohmyzsh}/REPO=${REPO:-mirrors\/oh-my-zsh}/g' $tmp_dir/install-3cr4.sh
-    sed -ie 's/REMOTE=${REMOTE:-https:\/\/github.com\/${REPO}.git}/REMOTE=${REMOTE:-https:\/\/gitee.com\/${REPO}.git}/g' $tmp_dir/install-3cr4.sh
-    chmod +x $tmp_dir/install-3cr4.sh
-    $tmp_dir/install-3cr4.sh
-    cd ~/.oh-my-zsh
-    if [ $? != 0 ]; then
-        color_red "oh-my-zsh安装失败！"
-    fi
-    cd ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/
-    if [ $? != 0 ]; then
-        curl $tools_url/archive/zsh-autosuggestions.tar.gz -o $tmp_dir/zsh-autosuggestions.tar.gz &&
-            cd $tmp_dir && tar -zxvf zsh-autosuggestions.tar.gz &&
-            mv zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/
-    fi
-    color_green "正在更换主题为 daveverwer"
-    sed -ie 's/^ZSH_THEME=.*/ZSH_THEME="daveverwer"/g' ~/.zshrc
-
-    #color_green "正在优化历史记录"
-    #echo -e "HISTFILE=\"\$HOME/.zsh_history\"\nHISTSIZE=10000000\nSAVEHIST=10000000" >> ~/.zshrc
-
-    color_green "正在启用扩展..."
-    if [ "$(sed -n '/^plugins=(git)/p' ~/.zshrc)" = "" ]; then
-        echo -n $(color_yellow "你已经修改过 .zshrc 的插件了，请手动添加 z sudo！(Press y to open vim or ENTER to continue)")
-        read ys
-        if [ "$ys" = "y" ]; then
-            vim ~/.zshrc "+/^plugins"
-        fi
-    else
-        sed -ie 's/plugins=(git)/plugins=(git z sudo)/g' ~/.zshrc
-    fi
-    color_green "zsh和oh-my-zsh已安装！"
-    cd $re
 }
 
 function linux_switch_package() {
@@ -280,28 +209,99 @@ function linux_switch_package() {
     esac
 }
 
+function install_zsh() {
+    if [ ! -d "$HOME/.oh-my-zsh" ]; then
+        install_test git && install_test curl && install_test zsh && install_test vim && install_test sl
+        if [ $? != 0 ]; then return; fi
+        curl https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh -o $tmp_dir/install-3cr4.sh && \
+        sed -ie 's/REPO=${REPO:-ohmyzsh\/ohmyzsh}/REPO=${REPO:-mirrors\/oh-my-zsh}/g' $tmp_dir/install-3cr4.sh && \
+        sed -ie 's/REMOTE=${REMOTE:-https:\/\/github.com\/${REPO}.git}/REMOTE=${REMOTE:-https:\/\/gitee.com\/${REPO}.git}/g' $tmp_dir/install-3cr4.sh && \
+        chmod +x $tmp_dir/install-3cr4.sh && \
+        $tmp_dir/install-3cr4.sh && \
+        cd ~/.oh-my-zsh
+        if [ $? != 0 ]; then
+            color_red "oh-my-zsh安装失败！"
+            return 1
+        fi
+        cd ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/
+        if [ $? != 0 ]; then
+            curl $tools_url/archive/zsh-autosuggestions.tar.gz -o $tmp_dir/zsh-autosuggestions.tar.gz &&
+                cd $tmp_dir && tar -zxvf zsh-autosuggestions.tar.gz &&
+                mv zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/
+        fi
+        color_green "正在更换主题为 daveverwer"
+        sed -ie 's/^ZSH_THEME="robbyrussell"/ZSH_THEME="daveverwer"/g' ~/.zshrc
+
+        #color_green "正在优化历史记录"
+        #echo -e "HISTFILE=\"\$HOME/.zsh_history\"\nHISTSIZE=10000000\nSAVEHIST=10000000" >> ~/.zshrc
+    fi
+
+    color_green "正在启用扩展..."
+    if [ "$(sed -n '/^plugins=(git)/p' ~/.zshrc)" = "" ]; then
+        echo -n $(color_yellow "你已经修改过 .zshrc 的插件了，请手动添加 z sudo！(Press y to open vim or ENTER to continue)")
+        read ys
+        if [ "$ys" = "y" ]; then
+            vim ~/.zshrc "+/^plugins"
+        fi
+    else
+        sed -ie 's/plugins=(git)/plugins=(git z sudo)/g' ~/.zshrc
+    fi
+    color_green "zsh和oh-my-zsh已安装！"
+    cd $re
+}
+
+function run_submenu() {
+    echo -n -e "\x1b[A"
+    er=(
+        "给加鸡腿" 
+        "返回上级菜单 ->"
+    )
+    list_input "$help_banner" er selected
+    case $selected in
+    "返回上级菜单 ->")  ;;
+    "给加鸡腿") theme_color=$red ;;
+    esac
+    echo -n -e "\x1b[A"
+}
+
+function exec_case() {
+    case $1 in
+    "替换包管理的源为国内") linux_switch_package ;;
+    "安装zsh和oh-my-zsh并替换主题") install_zsh ;;
+    "在线运行neofetch") run_neofetch ;;
+    "安装Homebrew并替换为国内源") install_homebrew ;;
+    "子菜单") run_submenu ;;
+    esac
+}
+
 function main() {
     if [ "$unix_s" = "Linux" ]; then
-        linux_help
+        help_ls=(
+            "替换包管理的源为国内"
+            "安装zsh和oh-my-zsh并替换主题"
+            "在线运行neofetch"
+            "退出"
+        )
     elif [ "$unix_s" = "Darwin" ]; then
-        darwin_help
+        help_ls=(
+            "安装Homebrew并替换为国内源"
+            "安装zsh和oh-my-zsh并替换主题"
+            "在线运行neofetch"
+            "子菜单"
+            "退出"
+        )
     else
         color_red "Unknown unix operating system name: "$unix_s
         return 1
     fi
-    color_gray "Powered by 缝合怪crazywhale"
     while true; do
-        echo -n "> $ "
-        read cmdline
-        if [[ $? == 1 ]]; then
-            echo ""
-            echo "Bye"
-            break
+        list_input "$help_banner" help_ls selected ssd
+        if [ "$selected" = "退出" ]; then
+            return 0
         fi
-        exec_case $cmdline
+        exec_case "$selected"
     done
 }
-
-re=$(pwd)
-
+#printf '\033[2J' # 这两行用来清屏的
+#printf '\033[H'
 main
