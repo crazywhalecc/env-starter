@@ -44,4 +44,4 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 - 使用方向键快速选择，比较酷炫（感谢 @kahkhang 开发的 [Inquirer.sh](https://github.com/kahkhang/Inquirer.sh)）
 
 ## 效果
-![](https://camo.githubusercontent.com/b2fc8dd58c165cf58071a70988c2e8a43d3dc1ddfed7e85e1d856481a21f6e08/68747470733a2f2f6170692e7a68616d616f2e78696e2f696d672f707265766965775f656e762d737461727465722e676966)
+<img src="https://camo.githubusercontent.com/b2fc8dd58c165cf58071a70988c2e8a43d3dc1ddfed7e85e1d856481a21f6e08/68747470733a2f2f6170692e7a68616d616f2e78696e2f696d672f707265766965775f656e762d737461727465722e676966" style="width: 40%; height: 40%"/>
