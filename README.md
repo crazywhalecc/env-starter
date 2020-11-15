@@ -43,3 +43,5 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 - 支持 termux 环境
 - 使用方向键快速选择，比较酷炫（感谢 @kahkhang 开发的 [Inquirer.sh](https://github.com/kahkhang/Inquirer.sh)）
 
+## 效果
+<img src="https://i.loli.net/2020/11/15/OokYNQwymUZ92Eq.gif" height="300" />
