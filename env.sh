@@ -9,10 +9,16 @@ unix_release=$(
         echo $HOME | grep com.termux >/dev/null
         if [ $? == 0 ]; then
             echo "termux"
-        elif [ "$(cat /etc/redhat-release | awk '{print $1}' | grep -v '^$')" = "CentOS" ]; then
-            echo "CentOS"
-        else
+        elif [ -f "/etc/redhat-release" ]; then
+            if [ "$(cat /etc/redhat-release | awk '{print $1}' | grep -v '^$')" = "CentOS" ]; then
+                echo "CentOS"
+            else
+                echo "unknown"
+            fi
+        elif [ -f "/etc/issue" ]; then
             cat /etc/issue | grep -v '^$' | awk '{print $1}'
+        else
+            echo "unknown"
         fi
     elif [ "$unix_s" = "Darwin" ]; then
         sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'
