@@ -293,7 +293,6 @@ function main() {
             "安装Homebrew并替换为国内源"
             "安装zsh和oh-my-zsh并替换主题"
             "在线运行neofetch"
-            "子菜单"
             "退出"
         )
     else

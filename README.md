@@ -3,14 +3,14 @@
 
 ## 使用
 ```bash
-# 下载方式 1 (国内可访问，但可能更新有延迟)
+# 直接运行方式 1 (国内可访问，但可能更新有延迟)
 bash -c "$(curl -fsSL https://api.zhamao.xin/tools/env.sh)"
 
-# 下载方式 2 (GitHub Pages)
+# 直接运行方式 2 (GitHub Pages)
 bash -c "$(curl -fsSL http://env.crazywhale.cn/env.sh)"
 
 # 下载方式 3 (因为 githubusercontent 被墙了，所以只能这么下)
-git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && chmod +x env.sh && mv env.sh ../ && cd ../ && rm -rf env-starter/ && ./env.sh
+git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && chmod +x env.sh && ./env.sh
 ```
 
 然后根据提示直接使用即可。
@@ -41,3 +41,4 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 ## 特色（虽然没啥用）
 - Ubuntu 包管理替换时检测如果系统是阿里云或腾讯云的镜像则询问用户是否替换
 - 支持 termux 环境
+- 使用方向键快速选择，比较酷炫（感谢 @kahkhang 开发的 [Inquirer.sh](https://github.com/kahkhang/Inquirer.sh)）
