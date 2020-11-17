@@ -1,7 +1,7 @@
 #!/bin/bash
 
 tmp_dir="/tmp" # 临时目录
-tools_url="http://env.crazywhale.cn"
+tools_url="http://env.crazywhale.cn" # 工具的源仓库地址
 unix_s=$(uname -s)
 initial_download_cmdline="curl"
 unix_release=$(
