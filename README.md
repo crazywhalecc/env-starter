@@ -39,7 +39,7 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 - [ ] Deepin
 
 ## 支持功能表
-|                              | Linux              | macOS              | MINGW              |
+|                              | Linux (including WSL(1/2))              | macOS (including latest version)             | MINGW (NT)             |
 | ---------------------------- | ------------------ | ------------------ | ------------------ |
 | 替换包管理的源为国内         | :zap: | :x:                | :x:                |
 | 安装zsh和oh-my-zsh并替换主题 | :white_check_mark: | :white_check_mark: | :x:                |
