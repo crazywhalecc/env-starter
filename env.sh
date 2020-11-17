@@ -286,6 +286,7 @@ function main() {
             "替换包管理的源为国内"
             "安装zsh和oh-my-zsh并替换主题"
             "在线运行neofetch"
+            "test"
             "退出"
         )
     elif [ "$unix_s" = "Darwin" ]; then
