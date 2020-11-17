@@ -3,7 +3,7 @@
 
 ## 使用
 ```bash
-# 直接运行方式 1 (国内可访问，但可能更新有延迟)
+# 直接运行方式 1 (国内服务器克隆仓库)
 bash -c "$(curl -fsSL https://api.zhamao.xin/tools/env.sh)"
 
 # 直接运行方式 2 (GitHub Pages)
