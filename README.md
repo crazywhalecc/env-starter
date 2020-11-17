@@ -38,6 +38,14 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 - [ ] Alpine
 - [ ] Deepin
 
+## 支持功能表
+|                              | Linux              | macOS              | MINGW              |
+| ---------------------------- | ------------------ | ------------------ | ------------------ |
+| 替换包管理的源为国内         | :white_check_mark: | :x:                | :x:                |
+| 安装zsh和oh-my-zsh并替换主题 | :white_check_mark: | :white_check_mark: | :x:                |
+| 在线运行neofetch             | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| 安装Homebrew并替换为国内源   | :x:                | :white_check_mark: | :x:                |
+
 ## 特色（虽然没啥用）
 - Ubuntu 包管理替换时检测如果系统是阿里云或腾讯云的镜像则询问用户是否替换
 - 支持 termux 环境
