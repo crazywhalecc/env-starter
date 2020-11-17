@@ -46,11 +46,7 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 | 在线运行neofetch             | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | 安装Homebrew并替换为国内源   | :x:                | :white_check_mark: | :x:                |
 
-> :zap:：此类型系统下部分版本可用
-
-> :white_check_mark:：此系统下可用
-
-> :x:：此系统下不可用，在菜单中不会显示
+> :zap:：此类型系统下部分版本可用，:white_check_mark:：此系统下可用，:x:：此系统下不可用，在菜单中不会显示
 
 ## 特色（虽然没啥用）
 - Ubuntu 包管理替换时检测如果系统是阿里云或腾讯云的镜像则询问用户是否替换
