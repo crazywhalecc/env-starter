@@ -5,7 +5,8 @@
 OLD_SET=$-
 set -e
 
-arrow="$(echo -e '\xe2\x9d\xaf')"
+#arrow="$(echo -e '\xe2\x9d\xaf')"
+arrow=">"
 checked="$(echo -e '\xe2\x97\x89')"
 unchecked="$(echo -e '\xe2\x97\xaf')"
 
