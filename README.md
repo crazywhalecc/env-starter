@@ -47,7 +47,9 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 | 安装Homebrew并替换为国内源   | :x:                | :white_check_mark: | :x:                |
 
 > :zap:：此类型系统下部分版本可用
+
 > :white_check_mark:：此系统下可用
+
 > :x:：此系统下不可用，在菜单中不会显示
 
 ## 特色（虽然没啥用）
