@@ -98,6 +98,7 @@ on_keypress() {
           ;;
       ' ') eval $on_space ' ';;
       'q') echo "" && exit ;;
+      't') run_submenu ;;
       [a-z0-9A-Z\!\#\$\&\+\,\-\.\/\;\=\?\@\[\]\^\_\{\}\~]) eval $on_ascii $key;;
       $'\x7f') eval $on_backspace $key;;
       '') eval $on_enter $key;;
