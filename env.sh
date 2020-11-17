@@ -296,7 +296,7 @@ function main() {
             "退出"
         )
     elif [ "$unix_s" = "MINGW64_NT-10.0-19041" ]; then
-        help_ls=("在线运行neofetch")
+        help_ls=("在线运行neofetch" "子菜单" "退出")
     else
         color_red "Unknown unix operating system name: "$unix_s
         return 1
