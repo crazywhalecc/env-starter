@@ -278,7 +278,7 @@ function install_zsh() {
         cd ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions/
         if [ $? != 0 ]; then
             curl $tools_url/archive/zsh-autosuggestions.tar.gz -o $tmp_dir/zsh-autosuggestions.tar.gz &&
-                cd $tmp_dir && tar -zxvf --no-same-owner zsh-autosuggestions.tar.gz &&
+                cd $tmp_dir && tar --no-same-owner -zxvf zsh-autosuggestions.tar.gz &&
                 mv zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/
         fi
         color_green "正在更换主题为 daveverwer"
