@@ -281,26 +281,31 @@ function exec_case() {
 }
 
 function main() {
-    if [ "$unix_s" = "Linux" ]; then
+    case $unix_s in
+    "Linux")
         help_ls=(
             "替换包管理的源为国内"
             "安装zsh和oh-my-zsh并替换主题"
+            "安装Homebrew并替换为国内源"
             "在线运行neofetch"
             "退出"
         )
-    elif [ "$unix_s" = "Darwin" ]; then
+        ;;
+    "Darwin")
         help_ls=(
             "安装Homebrew并替换为国内源"
             "安装zsh和oh-my-zsh并替换主题"
             "在线运行neofetch"
             "退出"
         )
-    elif [[ "$unix_s" = "MINGW64_NT-10.0-19041" || "$unix_s" = "CYGWIN_NT-10.0" ]]; then
+        ;;
+    "MINGW64_NT-10.0-19041"|"CYGWIN_NT-10.0")
         help_ls=("在线运行neofetch" "子菜单" "退出")
-    else
+        ;;
+    *)
         color_red "Unknown unix operating system name: "$unix_s
         return 1
-    fi
+    esac
     while true; do
         list_input "$help_banner" help_ls selected ssd
         if [ "$selected" = "退出" ]; then
