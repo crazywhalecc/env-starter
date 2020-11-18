@@ -148,7 +148,7 @@ function install_homebrew() {
 
 function run_neofetch() {
     if [ ! -x "$tmp_dir/neofetch" ]; then
-        curl -o $tmp_dir/neofetch -s https://gitee.com/mirrors/neofetch/raw/master/neofetch && chmod +x $tmp_dir/neofetch 
+        curl -o $tmp_dir/neofetch -H 'User-Agent: Chrome' -s https://gitee.com/mirrors/neofetch/raw/master/neofetch && chmod +x $tmp_dir/neofetch 
     fi
     if [ ! -x "$tmp_dir/neofetch" ]; then
         color_red "neofetch 下载失败！"
