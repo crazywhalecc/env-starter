@@ -256,7 +256,10 @@ function linux_switch_package() {
         fi
         sudo apt-get update
         ;;
-    "Alpine") sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories ;;
+    "Alpine") 
+        sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+        color_green "替换成功！"
+        ;;
     *) color_red "不支持的发行版：$unix_release" ;;
     esac
 }
