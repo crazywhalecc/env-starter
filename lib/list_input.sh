@@ -183,7 +183,7 @@ on_list_input_up() {
     tput el
   fi
 
-  printf "${theme_color}${arrow} %s ${normal}" "${_list_options[$_list_selected_index]}"
+  printf "${theme_color}${arrow} %b ${normal}" "${_list_options[$_list_selected_index]}"
 }
 
 on_list_input_down() {
@@ -203,7 +203,7 @@ on_list_input_down() {
     tput cub "$(tput cols)"
     tput el
   fi
-  printf "${theme_color}${arrow} %s ${normal}" "${_list_options[$_list_selected_index]}"
+  printf "${theme_color}${arrow} %b ${normal}" "${_list_options[$_list_selected_index]}"
 }
 
 on_list_input_enter_space() {
