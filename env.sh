@@ -217,7 +217,7 @@ function linux_switch_package() {
 
 function install_zsh() {
     if [ ! -d "$HOME/.oh-my-zsh" ]; then
-        install_test git && install_test curl && install_test zsh && install_test vim && install_test sl
+        install_test git && install_test curl && install_test zsh && install_test vim
         if [ $? != 0 ]; then return; fi
         curl https://gitee.com/mirrors/oh-my-zsh/raw/master/tools/install.sh -o $tmp_dir/install-3cr4.sh && \
         sed -ie 's/REPO=${REPO:-ohmyzsh\/ohmyzsh}/REPO=${REPO:-mirrors\/oh-my-zsh}/g' $tmp_dir/install-3cr4.sh && \
