@@ -20,6 +20,9 @@ cyan="$(tput setaf 6)"
 white="$(tput setaf 7)"
 bold="$(tput bold)"
 normal="$(tput sgr0)"
+blink="$(echo -n -e '\033[5m')"
+underscore="$(echo -n -e '\033[4m')"
+italic="$(echo -n -e '\033[3m')"
 theme_color=$green
 dim=$'\e[2m'
 
