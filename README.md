@@ -35,7 +35,7 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 - [X] Debian
 - [ ] Raspbian
 - [ ] Arch Linux
-- [ ] Alpine
+- [X] Alpine
 - [ ] Deepin
 
 ## 支持功能表
