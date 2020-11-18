@@ -323,7 +323,7 @@ function exec_case() {
     "在线运行neofetch") run_neofetch ;;
     "安装Homebrew并替换为国内源") install_homebrew ;;
     "更换主题")
-        er=("red" "green" "blue" "black" "yellow" "magenta" "cyan" "white" "bold" "normal" "dim")
+        er=("red" "green" "blue" "black" "yellow" "magenta" "cyan" "white" "bold" "normal" "dim" "blink" "italic")
         run_submenu er "change_theme"
         ;;
     esac
@@ -351,7 +351,7 @@ function main() {
         )
         ;;
     "MINGW64_NT-10.0-19041"|"CYGWIN_NT-10.0")
-        help_ls=("在线运行neofetch" "子菜单" "更换主题""退出")
+        help_ls=("在线运行neofetch" "子菜单" "更换主题" "退出")
         ;;
     *)
         color_red "Unknown unix operating system name: "$unix_s
