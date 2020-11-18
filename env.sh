@@ -313,7 +313,7 @@ function run_submenu() {
 }
 
 function change_theme() {
-    theme_color=$1
+    theme_color=$(eval echo '$'$1)
 }
 
 function exec_case() {
@@ -351,7 +351,7 @@ function main() {
         )
         ;;
     "MINGW64_NT-10.0-19041"|"CYGWIN_NT-10.0")
-        help_ls=("在线运行neofetch" "子菜单" "更换主题" "退出")
+        help_ls=("在线运行neofetch" "子菜单" "更换主题""退出")
         ;;
     *)
         color_red "Unknown unix operating system name: "$unix_s
