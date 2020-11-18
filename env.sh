@@ -9,19 +9,30 @@ unix_release=$(
         echo $HOME | grep com.termux >/dev/null
         if [ $? == 0 ]; then
             echo "termux"
+            return 0
         elif [ -f "/etc/redhat-release" ]; then
             if [ "$(cat /etc/redhat-release | awk '{print $1}' | grep -v '^$')" = "CentOS" ]; then
                 echo "CentOS"
             else
                 echo "unknown"
             fi
-        elif [ -f "/etc/issue" ]; then
+            return 0
+        elif [ -f "/etc/os-release" ]; then
+            cat /etc/os-release | grep Alpine > /dev/null
+            if [ $? == 0 ]; then
+                echo "Alpine"
+                return 0
+            fi
+        fi
+        if [ -f "/etc/issue" ]; then
             cat /etc/issue | grep -v '^$' | awk '{print $1}'
         else
             echo "unknown"
         fi
+        return 0
     elif [ "$unix_s" = "Darwin" ]; then
         sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'
+        return 0
     fi
 )
 unix_release=$(echo $unix_release | xargs)
