@@ -307,16 +307,13 @@ function install_zsh() {
 
 function run_submenu() {
     echo -n -e "\x1b[A"
-    er=(
-        "给加鸡腿" 
-        "返回上级菜单 ->"
-    )
-    list_input "$help_banner" er selected
-    case $selected in
-    "返回上级菜单 ->")  ;;
-    "给加鸡腿") theme_color=$red ;;
-    esac
+    list_input "$help_banner" $1 selected
+    $2 $selected
     echo -n -e "\x1b[A"
+}
+
+function change_theme() {
+    theme_color=$1
 }
 
 function exec_case() {
@@ -325,7 +322,10 @@ function exec_case() {
     "安装zsh和oh-my-zsh并替换主题") install_zsh ;;
     "在线运行neofetch") run_neofetch ;;
     "安装Homebrew并替换为国内源") install_homebrew ;;
-    "子菜单") run_submenu ;;
+    "更换主题")
+        er=("red" "green" "blue" "black" "yellow" "magenta" "cyan" "white" "bold" "normal" "dim")
+        run_submenu er "change_theme"
+        ;;
     esac
 }
 
