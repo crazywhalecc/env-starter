@@ -44,7 +44,7 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 | 替换包管理的源为国内         | :zap: | :x:                | :x:                |
 | 安装zsh和oh-my-zsh并替换主题 | :white_check_mark: | :white_check_mark: | :x:                |
 | 在线运行neofetch             | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| 安装Homebrew并替换为国内源   | :x:                | :white_check_mark: | :x:                |
+| 安装Homebrew并替换为国内源   | :white_check_mark:                | :white_check_mark: | :x:                |
 
 > :zap:：此类型系统下部分版本可用，:white_check_mark:：此系统下可用，:x:：此系统下不可用，在菜单中不会显示
 
