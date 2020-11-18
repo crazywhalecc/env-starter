@@ -5,35 +5,34 @@ tools_url="http://env.crazywhale.cn" # 工具的源仓库地址
 unix_s=$(uname -s)
 initial_download_cmdline="curl"
 unix_release=$(
+    marked_release=""
     if [ "$unix_s" = "Linux" ]; then
         echo $HOME | grep com.termux >/dev/null
         if [ $? == 0 ]; then
-            echo "termux"
-            return 0
+            marked_release="termux"
         elif [ -f "/etc/redhat-release" ]; then
             if [ "$(cat /etc/redhat-release | awk '{print $1}' | grep -v '^$')" = "CentOS" ]; then
-                echo "CentOS"
+                marked_release="CentOS"
             else
-                echo "unknown"
+                marked_release="unknown"
             fi
-            return 0
         elif [ -f "/etc/os-release" ]; then
             cat /etc/os-release | grep Alpine > /dev/null
             if [ $? == 0 ]; then
-                echo "Alpine"
-                return 0
+                marked_release="Alpine"
             fi
         fi
-        if [ -f "/etc/issue" ]; then
-            cat /etc/issue | grep -v '^$' | awk '{print $1}'
-        else
-            echo "unknown"
+        if [ "$marked_release" = "" ]; then
+            if [ -f "/etc/issue" ]; then
+                marked_release=$(cat /etc/issue | grep -v '^$' | awk '{print $1}')
+            else
+                marked_release="unknown"
+            fi
         fi
-        return 0
     elif [ "$unix_s" = "Darwin" ]; then
-        sw_vers | grep ProductName | awk '{print $2" "$3" "$4}'
-        return 0
+        marked_release=$(sw_vers | grep ProductName | awk '{print $2" "$3" "$4}')
     fi
+    echo $marked_release
 )
 unix_release=$(echo $unix_release | xargs)
 help_banner="====== $unix_release-"$(uname -m)"("$(whoami)") ======"
