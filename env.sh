@@ -105,6 +105,20 @@ deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu$is_ports/ $ubuntu_apt_ver-securi
 "
 }
 
+function debian_apt_source() {
+    echo "#script generated
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ $ubuntu_apt_ver main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ $ubuntu_apt_ver main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ $ubuntu_apt_ver-updates main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ $ubuntu_apt_ver-updates main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian/ $ubuntu_apt_ver-backports main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian/ $ubuntu_apt_ver-backports main contrib non-free
+deb https://mirrors.tuna.tsinghua.edu.cn/debian-security $ubuntu_apt_ver/updates main contrib non-free
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/debian-security $ubuntu_apt_ver/updates main contrib non-free
+"
+}
+
 ###################### color part ###############################################
 function color_red() { echo -n -e "\033[31m"$*"\033[0m\n"; }
 function color_green() { echo -n -e "\033[32m"$*"\033[0m\n"; }
@@ -208,6 +222,28 @@ function linux_switch_package() {
         if [ $? != 0 ]; then return; fi
         echo "正在备份原 /etc/yum.repos.d/CentOS-Base.repo"
         sudo cp /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.bak
+        ;;
+    "Debian")
+        key=$(cat /etc/apt/sources.list | awk '{print $1}' | head -n 1)
+        if [ "$key" != "#script" ]; then
+            detect_aliyun_tencentyun && return
+            echo "正在备份原 /etc/apt/sources.list ..."
+            sudo cp /etc/apt/sources.list /etc/apt/sources.list.old
+            sudo apt install apt-transport-https ca-certificates
+            # 判断debian版本和架构
+            if [[ "$(arch)" = "x86_64" || "$(arch)" = "i686" ]]; then # 当前是x86架构
+                ubuntu_apt_ver=$(cat /etc/os-release | grep VERSION_CODENAME | awk -F\= '{print $2}')
+                debian_apt_source | sudo tee /etc/apt/sources.list
+            elif [ "$(arch)" = "aarch64" ]; then
+                ubuntu_apt_ver=$(cat /etc/os-release | grep VERSION_CODENAME | awk -F\= '{print $2}')
+                debian_apt_source | sudo tee /etc/apt/sources.list
+            else
+                color_red "当前架构暂不支持！"
+                break
+            fi
+            color_green 成功替换为国内，正在update
+        fi
+        sudo apt-get update
         ;;
     *)
         color_red "不支持的发行版：$unix_release"
