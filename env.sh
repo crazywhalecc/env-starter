@@ -229,7 +229,7 @@ function linux_switch_package() {
             detect_aliyun_tencentyun && return
             echo "正在备份原 /etc/apt/sources.list ..."
             sudo cp /etc/apt/sources.list /etc/apt/sources.list.old
-            sudo apt install apt-transport-https ca-certificates
+            sudo apt install apt-transport-https ca-certificates -y
             # 判断debian版本和架构
             if [[ "$(arch)" = "x86_64" || "$(arch)" = "i686" ]]; then # 当前是x86架构
                 ubuntu_apt_ver=$(cat /etc/os-release | grep VERSION_CODENAME | awk -F\= '{print $2}')
