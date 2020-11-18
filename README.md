@@ -32,7 +32,7 @@ git clone https://github.com/crazywhalecc/env-starter.git && cd env-starter && c
 - [X] Termux (with Android)
 - [ ] CentOS
 - [ ] Pop!_OS
-- [ ] Debian
+- [X] Debian
 - [ ] Raspbian
 - [ ] Arch Linux
 - [ ] Alpine
