@@ -337,6 +337,7 @@ function main() {
             "安装zsh和oh-my-zsh并替换主题"
             "安装Homebrew并替换为国内源"
             "在线运行neofetch"
+            "更换主题"
             "退出"
         )
         ;;
@@ -345,11 +346,12 @@ function main() {
             "安装Homebrew并替换为国内源"
             "安装zsh和oh-my-zsh并替换主题"
             "在线运行neofetch"
+            "更换主题"
             "退出"
         )
         ;;
     "MINGW64_NT-10.0-19041"|"CYGWIN_NT-10.0")
-        help_ls=("在线运行neofetch" "子菜单" "退出")
+        help_ls=("在线运行neofetch" "子菜单" "更换主题" "退出")
         ;;
     *)
         color_red "Unknown unix operating system name: "$unix_s
