@@ -82,6 +82,7 @@ function install_software() {
         "Kali" | "Ubuntu" | "Debian" | "Raspbian" | 'Pop!_OS') sudo apt-get install $1 -y ;;
         "termux") pkg install $1 -y ;;
         "CentOS") sudo yum install $1 -y ;;
+        "Alpine") apk add $1 ;;
         esac
     elif [ "$unix_s" = "Darwin" ]; then
         brew install $1
@@ -255,9 +256,8 @@ function linux_switch_package() {
         fi
         sudo apt-get update
         ;;
-    *)
-        color_red "不支持的发行版：$unix_release"
-        ;;
+    "Alpine") sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories ;;
+    *) color_red "不支持的发行版：$unix_release" ;;
     esac
 }
 
